@@ -7,9 +7,8 @@
 ** 10/18/19
 */
 
-#ifndef _OTHER_H_
-#define _OTHER_H_
-
+#ifndef _func_H_
+#define _func_H_
 void input(char [],int);
 void parse(char [],int,char **,int,char **,int);
 void process(int ,int ,char **);

@@ -1,0 +1,3 @@
+ls -la
+pwd ; echo is this working?
+echo is it reading this?
