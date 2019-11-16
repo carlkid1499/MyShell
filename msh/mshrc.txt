@@ -1,3 +1,7 @@
+color red
 ls -la
-pwd ; echo is this working?
-echo is it reading this?
+pwd; echo does it work
+echo test1
+echo test2
+echo test3
+color purple

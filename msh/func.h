@@ -12,5 +12,7 @@
 void input(char [],int);
 void parse(char [],int,char **,int,char **,int);
 void process(int ,int ,char **);
+void text_color(char [],int);
+void read_file(char[],int);
 
 #endif

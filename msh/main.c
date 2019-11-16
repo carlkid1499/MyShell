@@ -14,7 +14,7 @@
 #include <sys/types.h> // for waitpid()
 #include <sys/wait.h>  // for waitpid()
 #include "func.h"
-#define MAX 64
+#define MAX 1024
 /* ----- END: Includes & Defines ----- */
 
 /* ----- BEGIN: Global  Variables ----- */
@@ -25,34 +25,19 @@ int status_PID; // integer for the status after running execvp
 int main()
 {
     /* ----- BEGIN: Startup code ----- */
-    char input_str[MAX];                                    // create a string to receive user input
-    char **temp_file_lines;                                 // array for comand and arguments
-    temp_file_lines = (char **)malloc(64 * sizeof(char *)); //allocate that mem
+    char **args;                                 // array for comand and arguments
+    args = (char **)malloc(64 * sizeof(char *)); //allocate that mem
+    int args_index = 0;                          // inital index for args 2-D array
 
-    char filename[] = "mshrc.txt";     // the file to read
-    FILE *file = fopen(filename, "r"); // file IO pointer
-    if (file != NULL)
-    { // open if it exists
-        char line[MAX];
-        int Line_num_cnt = 0;
-        while (fgets(line, MAX, file)) /* read a line from a file */
-        {
-            printf("Reading from file: %s\n", line);
-            temp_file_lines[Line_num_cnt] = line;
-            Line_num_cnt++;
-        }
-        temp_file_lines[Line_num_cnt++] = NULL;    // add null to the end
-        printf("Line Count: %d \n", Line_num_cnt); // print out the total number of lines read
-        fclose(file);                              // close the file
-        printf("Temp File  Line Array: %s \n", temp_file_lines[0]);
-        printf("Temp File  Line Array: %s \n", temp_file_lines[1]);
-        printf("Temp File  Line Array: %s \n", temp_file_lines[2]);
-        printf("Temp File  Line Array: %s \n", temp_file_lines[3]);
-    }
-    else
-    {
-        perror(filename); //print the error message on stderr.
-    }
+    char **temp_args;                                 // array for comand and arguments
+    temp_args = (char **)malloc(64 * sizeof(char *)); //allocate that mem
+    int temp_args_index = 0;
+    char input_str[MAX];       // string for the user input
+    read_file(input_str, MAX); // read from the mshrc file
+    //printf("%s \n",input_str); // print the input_str to see if there's stuff there after the read_file funtion
+    parse(input_str, MAX, args, args_index, temp_args, temp_args_index); // free the mem
+    free((void *)temp_args);                                             // free the mem
+    free((void *)args);
     /* ----- END: Startup code ----- */
 
     while (1) // while not true
@@ -99,11 +84,12 @@ void parse(char input_str[], int size, char **args, int args_index, char **temp_
     if ((strcmp(input_str, "exit")) == 0) // compare the string with "exit". If match exit
     {
         special_command = 1; // set the special command flag
-        exit(0); // terminate and exit
+        exit(0);             // terminate and exit
     }
     /* ----- BEGIN: Color Options ----- */
     else if ((strcmp(input_str, "color black")) == 0)
-    {   special_command = 1; // set the special command flag
+    {
+        special_command = 1; // set the special command flag
         printf("\033[0;30m");
     }
 
@@ -195,71 +181,71 @@ void parse(char input_str[], int size, char **args, int args_index, char **temp_
         printf("\033[1;37m");
     }
     /* ----- END: Color Options ----- */
-/* ----- BEGIN: Pipe Case ----- */
-else if (c_pipe != NULL)
-{
-    printf("Found: | \n");
-    char *token = strtok(input_str, "|"); // grab a ; token from the inpput str
-    while (token != NULL)                 // continue grabbing tokens until end
+    /* ----- BEGIN: Pipe Case ----- */
+    else if (c_pipe != NULL)
     {
-        printf("token for | : %s \n", token);
-        temp_args[temp_args_index] = token; // grab each token and insert into rows of 2-D array
-        temp_args_index++;                  // increment index
-        token = strtok(NULL, "|");          // grab the next token
-    }
-    temp_args[temp_args_index] = NULL; // add a NULL to the end of 2-d array
-}
-/* ----- END: Pipe Case ----- */
-
-/* ----- BEGIN: Semicolon Case ----- */
-else if (c_semi != NULL)
-{
-    // old debug code printf("Found: ; \n");
-    char *token = strtok(input_str, ";"); // grab a ; token from the inpput str
-    while (token != NULL)                 // continue grabbing tokens until end
-    {
-        // old debug code printf("token for ; : %s \n", token);
-        temp_args[temp_args_index] = token; // grab each token and insert into rows of 2-D array
-        temp_args_index++;                  // increment index
-        token = strtok(NULL, ";");          // grab the next token
-    }
-    temp_args[temp_args_index] = NULL; // add a NULL to the end of 2-d array
-
-    // now lets parse the stuff in the temp array into it's commands
-    int i = 0;
-    while (i < temp_args_index) // move through the 2-d array
-    {
-        args_index = 0;                          //reset the index everytime the loop is entered
-        char *token = strtok(temp_args[i], " "); // grab a token from the temp_args rows
-        // old debug code printf("token grabbed: %s",token);
-        while (token != NULL) // continue grabbing tokens until end of fow
+        printf("Found: | \n");
+        char *token = strtok(input_str, "|"); // grab a ; token from the inpput str
+        while (token != NULL)                 // continue grabbing tokens until end
         {
-            // old debug code printf("token for a space : %s \n", token);
-            args[args_index] = token;  // grab each token and insert into rows of 2-D array
-            args_index++;              // increment index
-            token = strtok(NULL, " "); // grab the next token
+            printf("token for | : %s \n", token);
+            temp_args[temp_args_index] = token; // grab each token and insert into rows of 2-D array
+            temp_args_index++;                  // increment index
+            token = strtok(NULL, "|");          // grab the next token
         }
-        args[args_index] = NULL; // add a NULL to the end of 2-d array
-        process(child_PID, status_PID, args);
+        temp_args[temp_args_index] = NULL; // add a NULL to the end of 2-d array
+    }
+    /* ----- END: Pipe Case ----- */
 
-        i++; // increment i
-    }
-}
-/* ----- END: Semicolon Case ----- */
-else
-{
-    // no ; or | ... continue with regular parse
-    char *token = strtok(token, " "); // grab a " "
-    while (token != NULL)             // continue grabbing tokens until end
+    /* ----- BEGIN: Semicolon Case ----- */
+    else if (c_semi != NULL)
     {
-        //debug code printf("token: %s \n", token);
-        args[args_index] = token; // grab each token and insert into rows of 2-D array
-        args_index++;
-        token = strtok(NULL, " "); // grab the next tokens
+        // old debug code printf("Found: ; \n");
+        char *token = strtok(input_str, ";"); // grab a ; token from the inpput str
+        while (token != NULL)                 // continue grabbing tokens until end
+        {
+            // old debug code printf("token for ; : %s \n", token);
+            temp_args[temp_args_index] = token; // grab each token and insert into rows of 2-D array
+            temp_args_index++;                  // increment index
+            token = strtok(NULL, ";");          // grab the next token
+        }
+        temp_args[temp_args_index] = NULL; // add a NULL to the end of 2-d array
+
+        // now lets parse the stuff in the temp array into it's commands
+        int i = 0;
+        while (i < temp_args_index) // move through the 2-d array
+        {
+            args_index = 0;                          //reset the index everytime the loop is entered
+            char *token = strtok(temp_args[i], " "); // grab a token from the temp_args rows
+            // old debug code printf("token grabbed: %s",token);
+            while (token != NULL) // continue grabbing tokens until end of fow
+            {
+                // old debug code printf("token for a space : %s \n", token);
+                args[args_index] = token;  // grab each token and insert into rows of 2-D array
+                args_index++;              // increment index
+                token = strtok(NULL, " "); // grab the next token
+            }
+            args[args_index] = NULL; // add a NULL to the end of 2-d array
+            process(child_PID, status_PID, args);
+
+            i++; // increment i
+        }
     }
-    args[args_index] = NULL; // add a NULL to the end
-    process(child_PID, status_PID, args);
-}
+    /* ----- END: Semicolon Case ----- */
+    else
+    {
+        // no ; or | ... continue with regular parse
+        char *token = strtok(token, " "); // grab a " "
+        while (token != NULL)             // continue grabbing tokens until end
+        {
+            //debug code printf("token: %s \n", token);
+            args[args_index] = token; // grab each token and insert into rows of 2-D array
+            args_index++;
+            token = strtok(NULL, " "); // grab the next tokens
+        }
+        args[args_index] = NULL; // add a NULL to the end
+        process(child_PID, status_PID, args);
+    }
 }
 
 void process(int child_PID, int status_PID, char **args)
@@ -289,4 +275,34 @@ void process(int child_PID, int status_PID, char **args)
         // old debug code printf("Status  PID: %i",status_PID);
     }
     /* ----- END: Fork a process ----- */
+}
+
+void read_file(char input_str[], int size)
+{
+    char filename[] = "mshrc.txt"; // the file to read
+    FILE *file = fopen(filename, "r"); // file IO pointer
+    if (file != NULL)
+    { // open if it exists
+        int i = 0;
+        int temp;
+        while ((temp = fgetc(file)) != EOF) // grab one character at a time
+        {
+            if (temp == '\n')
+            {
+                input_str[i] = ';'; // add a ";" to the end of every line
+                i++;
+            }
+            else
+            {
+                input_str[i] = temp;
+                i++;
+            }
+        }
+
+        fclose(file);
+    }
+    else
+    {
+        perror(filename); //print the error message on stderr.
+    }
 }
