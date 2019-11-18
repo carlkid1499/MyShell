@@ -1,7 +1,6 @@
-color red
 ls -la
 pwd; echo does it work
-echo test1
-echo test2
-echo test3
-color purple
+echo test1 read commands from a file
+echo test2 is this actually working?
+echo test3 yay it works!
+date

@@ -12,4 +12,4 @@
 # Please note this is a babyshell. Not all commands will work.
 
 all:
-	gcc main.c -w -o msh
+	gcc main.c queue2.c -w -o msh

@@ -20,40 +20,39 @@
 /* ----- BEGIN: Global  Variables ----- */
 int child_PID;  // integer for child PID after a fork
 int status_PID; // integer for the status after running execvp
+int command_history_counter = 0;
+char command_history_str[MAX];                                 // array for comand and arguments
+Queue *Q;
 /* -----  END: Global  Variables ----- */
 
 int main()
 {
     /* ----- BEGIN: Startup code ----- */
     char **args;                                 // array for comand and arguments
-    args = (char **)malloc(64 * sizeof(char *)); //allocate that mem
-    int args_index = 0;                          // inital index for args 2-D array
-
     char **temp_args;                                 // array for comand and arguments
-    temp_args = (char **)malloc(64 * sizeof(char *)); //allocate that mem
-    int temp_args_index = 0;
+    Queue *Q = createQueue(MAX);
     char input_str[MAX];       // string for the user input
     read_file(input_str, MAX); // read from the mshrc file
     //printf("%s \n",input_str); // print the input_str to see if there's stuff there after the read_file funtion
-    parse(input_str, MAX, args, args_index, temp_args, temp_args_index); // free the mem
-    free((void *)temp_args);                                             // free the mem
-    free((void *)args);
+    parse(input_str, MAX, args, temp_args); // free the mem
+    printf("Command History: %s \n",command_history_str);
+    history_parse(Q); // prase the history str
+    printf("Front element is %s\n", front(Q));
     /* ----- END: Startup code ----- */
+
 
     while (1) // while not true
     {
-        char **args;                                 // array for comand and arguments
-        args = (char **)malloc(64 * sizeof(char *)); //allocate that mem
-        int args_index = 0;                          // inital index for args 2-D array
+        input(input_str, MAX);  // call the input funtion
+        parse(input_str, MAX, args,temp_args); // call the parse funtion
+        printf("Command History: %s \n",command_history_str);
+        history_parse(*(&(Q)));
+        //old debug code printf("Front element is %s\n", front(Q));
 
-        char **temp_args;                                 // array for comand and arguments
-        temp_args = (char **)malloc(64 * sizeof(char *)); //allocate that mem
-        int temp_args_index = 0;
-        input(input_str, MAX);                                               // call the input funtion
-        parse(input_str, MAX, args, args_index, temp_args, temp_args_index); // call the parse funtion
-        free((void *)temp_args);                                             // free the mem
-        free((void *)args);                                                  // free the mem
+        
     }
+
+    DelQueue(Q); // delete the queue
 }
 
 void input(char input_str[], int size)
@@ -73,9 +72,13 @@ void input(char input_str[], int size)
     // old debug code printf("Input accepted:%s \n",input_str);
 }
 
-void parse(char input_str[], int size, char **args, int args_index, char **temp_args, int temp_args_index)
+void parse(char input_str[], int size, char **args,char **temp_args)
 {
     /* ----- BEGIN: Parse Process ----- */
+    args = (char **)malloc(MAX * sizeof(char *)); //allocate that mem
+    int args_index = 0;
+    temp_args = (char **)malloc(MAX * sizeof(char *)); //allocate that mem
+    int temp_args_index = 0;
     int special_command = 0; // flag for exit or color command
     char *c_semi;
     char *c_pipe;
@@ -227,6 +230,7 @@ void parse(char input_str[], int size, char **args, int args_index, char **temp_
             }
             args[args_index] = NULL; // add a NULL to the end of 2-d array
             process(child_PID, status_PID, args);
+            history_str(args);
 
             i++; // increment i
         }
@@ -245,7 +249,16 @@ void parse(char input_str[], int size, char **args, int args_index, char **temp_
         }
         args[args_index] = NULL; // add a NULL to the end
         process(child_PID, status_PID, args);
+        history_str(args);
     }
+
+
+
+
+    free((void *)args);  // free the mem
+    free((void *)temp_args);  // free the mem
+
+    
 }
 
 void process(int child_PID, int status_PID, char **args)
@@ -287,7 +300,7 @@ void read_file(char input_str[], int size)
         int temp;
         while ((temp = fgetc(file)) != EOF) // grab one character at a time
         {
-            if (temp == '\n')
+            if (temp == '\n') // you reached a new line
             {
                 input_str[i] = ';'; // add a ";" to the end of every line
                 i++;
@@ -298,11 +311,43 @@ void read_file(char input_str[], int size)
                 i++;
             }
         }
-
         fclose(file);
     }
     else
     {
         perror(filename); //print the error message on stderr.
     }
+}
+
+void history_str(char ** args)
+{
+    int i = 0;
+    while (args[i] != NULL)
+    {
+        //debug code printf("Ags list: %s\n",args[i]);
+        strcat(command_history_str,args[i]); // strcat(dest, src)
+        strcat(command_history_str," "); // add a space when adding to temp[MAX]
+        i++;
+    }
+    strcat(command_history_str,","); // add a "," after each command
+    command_history_counter++;
+    //old debug code printf("Temp in history: %s\n",temp);
+    printf("Number of history commands: %d\n",command_history_counter);
+}
+
+void history_parse(Queue *Q)
+{
+    char *token;
+    char temp[MAX];
+    DelQueue(Q); // delete queue
+    strcpy(temp,command_history_str); // make a copy of command history: Perserve the data!!
+   /* get the first token */
+   token = strtok(temp, ",");
+   
+   /* walk through other tokens */
+   while( token != NULL ) {
+        // old debug code printf( "Token: %s\n", token );
+        Enqueue(Q,token); // add command to queue
+        token = strtok(NULL, ",");
+   }
 }
