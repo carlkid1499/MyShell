@@ -39,7 +39,7 @@ char *front(Queue *Q)
     if (Q->size != 0)
     {
         /* Return the element which is at the front*/
-        return Q->elements[Q->front];
+        return (Q->elements[Q->front]);
     }
     return NULL;
 }
@@ -95,6 +95,7 @@ void DelQueue(Queue *Q)
 
 void PrintQueue(Queue *Q)
 {
+    int temp = 0;
     if(Q->size == 0)
         {
             // old debug code printf("Error: Queue empty \n");
@@ -102,10 +103,12 @@ void PrintQueue(Queue *Q)
         }
     while(Q->temp < Q->size)
     {
-        
-        printf("Queue Element: %s\n", Q->elements[Q->temp]);
+        printf("%d ",temp);
+        printf("%s\n", Q->elements[Q->temp]);
+        temp++;
         Q->temp++;
         
     }
+    Q->temp = 0;
     return;
 }
