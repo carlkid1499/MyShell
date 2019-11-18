@@ -13,15 +13,17 @@ Queue *createQueue(int maxElements)
     Q->capacity = maxElements;
     Q->front = 0;
     Q->rear = -1;
+    Q->temp = 0;
     /* Return the pointer */
     return Q;
 }
 
 void Dequeue(Queue *Q)
 {
-    if (Q->size != 0)
+    int temp = Q->size; // save the size value
+    if (temp != 0)
     {
-        Q->size--;
+        temp--;
         Q->front++;
         /* As we fill elements in circular fashion */
         if (Q->front == Q->capacity)
@@ -73,15 +75,37 @@ void Enqueue(Queue *Q, char *element)
 
 void DelQueue(Queue *Q)
 {
-    while(Q->size != 0)
+    int temp = Q->size; // save the size value
+    while(temp !=0)
     {
-        Q->size--;
+        temp--;
         Q->front++;
-        /* As we fill elements in circular fashion */
+        if(Q->size == 0)
+        {
+            // old debug code printf("Error: Queue empty \n");
+            return;
+        }
         if (Q->front == Q->capacity)
         {
             Q->front = 0;
         }
+    }
+    return;
+}
+
+void PrintQueue(Queue *Q)
+{
+    if(Q->size == 0)
+        {
+            // old debug code printf("Error: Queue empty \n");
+            return;
+        }
+    while(Q->temp < Q->size)
+    {
+        
+        printf("Queue Element: %s\n", Q->elements[Q->temp]);
+        Q->temp++;
+        
     }
     return;
 }

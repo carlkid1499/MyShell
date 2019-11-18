@@ -14,6 +14,7 @@ typedef struct Queue
     int capacity;
     int size;
     int front;
+    int temp;
     int rear;
     char **elements;
 } Queue;
@@ -37,5 +38,7 @@ char *front(Queue *Q);
 void Enqueue(Queue *Q, char *element);
 
 void DelQueue(Queue *Q);
+
+void PrintQueue(Queue *Q);
 
 #endif

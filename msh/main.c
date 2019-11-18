@@ -21,8 +21,8 @@
 int child_PID;  // integer for child PID after a fork
 int status_PID; // integer for the status after running execvp
 int command_history_counter = 0;
-char command_history_str[MAX];                                 // array for comand and arguments
-Queue *Q;
+char command_history_str[MAX]; 
+Queue *Q;                                // array for comand and arguments
 /* -----  END: Global  Variables ----- */
 
 int main()
@@ -30,14 +30,17 @@ int main()
     /* ----- BEGIN: Startup code ----- */
     char **args;                                 // array for comand and arguments
     char **temp_args;                                 // array for comand and arguments
-    Queue *Q = createQueue(MAX);
+    Q = createQueue(MAX);
     char input_str[MAX];       // string for the user input
     read_file(input_str, MAX); // read from the mshrc file
     //printf("%s \n",input_str); // print the input_str to see if there's stuff there after the read_file funtion
     parse(input_str, MAX, args, temp_args); // free the mem
-    printf("Command History: %s \n",command_history_str);
+    //old debug code printf("Command History: %s \n",command_history_str);
     history_parse(Q); // prase the history str
-    printf("Front element is %s\n", front(Q));
+    PrintQueue(Q);
+    DelQueue(Q); // delete the queue
+    PrintQueue(Q);
+    //old debug cold printf("Front element is %s\n", front(Q));
     /* ----- END: Startup code ----- */
 
 
@@ -45,11 +48,11 @@ int main()
     {
         input(input_str, MAX);  // call the input funtion
         parse(input_str, MAX, args,temp_args); // call the parse funtion
-        printf("Command History: %s \n",command_history_str);
-        history_parse(*(&(Q)));
+        //old debug code printf("Command History: %s \n",command_history_str);
+        DelQueue(Q); // delete queue
+        history_parse(Q);
+        PrintQueue(Q);
         //old debug code printf("Front element is %s\n", front(Q));
-
-        
     }
 
     DelQueue(Q); // delete the queue
@@ -94,94 +97,142 @@ void parse(char input_str[], int size, char **args,char **temp_args)
     {
         special_command = 1; // set the special command flag
         printf("\033[0;30m");
+        strcat(command_history_str,"color black"); // add command to history
+        strcat(command_history_str,","); // add a "," after each command
+        command_history_counter++; 
     }
 
     else if ((strcmp(input_str, "color dark grey")) == 0)
     {
         special_command = 1; // set the special command flag
         printf("\033[1;30m");
+        strcat(command_history_str,"color dark grey"); // add command to history
+        strcat(command_history_str,","); // add a "," after each command
+        command_history_counter++; 
     }
 
     else if ((strcmp(input_str, "color red")) == 0)
     {
         special_command = 1; // set the special command flag
         printf("\033[0;31m");
+        strcat(command_history_str,"color red"); // add command to history
+        strcat(command_history_str,","); // add a "," after each command
+        command_history_counter++; 
     }
     else if ((strcmp(input_str, "color light red")) == 0)
     {
         special_command = 1; // set the special command flag
         printf("\033[1;31m");
+        strcat(command_history_str,"color light red"); // add command to history
+        strcat(command_history_str,","); // add a "," after each command
+        command_history_counter++; 
     }
 
     else if ((strcmp(input_str, "color green")) == 0)
     {
         special_command = 1; // set the special command flag
         printf("\033[0;32m");
+        strcat(command_history_str,"color green"); // add command to history
+        strcat(command_history_str,","); // add a "," after each command
+        command_history_counter++; 
     }
 
     else if ((strcmp(input_str, "color light green")) == 0)
     {
         special_command = 1; // set the special command flag
         printf("\033[1;32m");
+        strcat(command_history_str,"color light green"); // add command to history
+        strcat(command_history_str,","); // add a "," after each command
+        command_history_counter++; 
     }
 
     else if ((strcmp(input_str, "color orange")) == 0)
     {
         special_command = 1; // set the special command flag
         printf("\033[0;33m");
+        strcat(command_history_str,"color orange"); // add command to history
+        strcat(command_history_str,","); // add a "," after each command
+        command_history_counter++; 
     }
 
     else if ((strcmp(input_str, "color yellow")) == 0)
     {
         special_command = 1; // set the special command flag
         printf("\033[1;33m");
+        strcat(command_history_str,"color yellow"); // add command to history
+        strcat(command_history_str,","); // add a "," after each command
+        command_history_counter++; 
     }
 
     else if ((strcmp(input_str, "color blue")) == 0)
     {
         special_command = 1; // set the special command flag
         printf("\033[0;34m");
+        strcat(command_history_str,"color blue"); // add command to history
+        strcat(command_history_str,","); // add a "," after each command
+        command_history_counter++; 
     }
 
     else if ((strcmp(input_str, "color light blue")) == 0)
     {
         special_command = 1; // set the special command flag
         printf("\033[1;34m");
+        strcat(command_history_str,"color light blue"); // add command to history
+        strcat(command_history_str,","); // add a "," after each command
+        command_history_counter++; 
     }
 
     else if ((strcmp(input_str, "color purple")) == 0)
     {
         special_command = 1; // set the special command flag
         printf("\033[0;35m");
+        strcat(command_history_str,"color purple"); // add command to history
+        strcat(command_history_str,","); // add a "," after each command
+        command_history_counter++; 
     }
 
     else if ((strcmp(input_str, "color light purple")) == 0)
     {
         special_command = 1; // set the special command flag
         printf("\033[1;35m");
+        strcat(command_history_str,"color light purple"); // add command to history
+        strcat(command_history_str,","); // add a "," after each command
+        command_history_counter++; 
     }
 
     else if ((strcmp(input_str, "color cyan")) == 0)
     {
         special_command = 1; // set the special command flag
         printf("\033[0;36m");
+        strcat(command_history_str,"color cyan"); // add command to history
+        strcat(command_history_str,","); // add a "," after each command
+        command_history_counter++; 
     }
 
     else if ((strcmp(input_str, "color light cyan")) == 0)
     {
         special_command = 1; // set the special command flag
         printf("\033[1;36m");
+        strcat(command_history_str,"color light cyan"); // add command to history
+        strcat(command_history_str,","); // add a "," after each command
+        command_history_counter++; 
     }
 
     else if ((strcmp(input_str, "color light gray")) == 0)
     {
         special_command = 1; // set the special command flag
         printf("\033[0;37m");
+        strcat(command_history_str,"color light gray"); // add command to history
+        strcat(command_history_str,","); // add a "," after each command
+        command_history_counter++; 
     }
     else if ((strcmp(input_str, "color white")) == 0)
     {
         special_command = 1; // set the special command flag
         printf("\033[1;37m");
+        strcat(command_history_str,"color white"); // add command to history
+        strcat(command_history_str,","); // add a "," after each command
+        command_history_counter++; 
     }
     /* ----- END: Color Options ----- */
     /* ----- BEGIN: Pipe Case ----- */
@@ -236,6 +287,14 @@ void parse(char input_str[], int size, char **args,char **temp_args)
         }
     }
     /* ----- END: Semicolon Case ----- */
+    else if ((strcmp(input_str, "history")) == 0)
+    {
+        PrintQueue(Q);
+        strcat(command_history_str,"history"); // add command to history
+        strcat(command_history_str,","); // add a "," after each command
+        command_history_counter++; 
+    }
+    
     else
     {
         // no ; or | ... continue with regular parse
@@ -339,7 +398,6 @@ void history_parse(Queue *Q)
 {
     char *token;
     char temp[MAX];
-    DelQueue(Q); // delete queue
     strcpy(temp,command_history_str); // make a copy of command history: Perserve the data!!
    /* get the first token */
    token = strtok(temp, ",");
@@ -347,7 +405,7 @@ void history_parse(Queue *Q)
    /* walk through other tokens */
    while( token != NULL ) {
         // old debug code printf( "Token: %s\n", token );
-        Enqueue(Q,token); // add command to queue
+        Enqueue(Q,token); //add new stuff to queue
         token = strtok(NULL, ",");
    }
 }
